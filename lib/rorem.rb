@@ -5,7 +5,7 @@ module Rorem
   end
     
   def self.init(language = 'english')
-    %w(array_extension randomizer analytics generator active_record_extension matcher filler).each do |path|
+    %w(array_extension randomizer analytics generator active_record_extension matcher).each do |path|
       require File.join(File.dirname(__FILE__), 'rorem', path)
     end
     

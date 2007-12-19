@@ -59,6 +59,18 @@ describe Rorem::ActiveRecordMethods do
       @instance.email.should be_nil
     end
     
+    it "should be awesome with a regex capturing group" do
+      matcher1 = Rorem::Matcher.new(/^(.*?)_name$/) do |rorem, type_of_name|
+        type_of_name
+      end
+
+      @klass.should_receive(:all_rorem_matchers).exactly(4).times.and_return([matcher1])
+
+      @instance.fill
+      @instance.first_name.should == "first"
+      @instance.last_name.should == "last"
+    end
+    
     it "should remember instance variables across matchers" do
 
       matcher1 = Rorem::Matcher.new(/_name$/) do |rorem|
