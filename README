@@ -1,0 +1,14 @@
+Rorem
+=====
+
+Rorem is a random data generator, to be use with ActiveRecord and probably (but not necessarily) Ruby on Rails. It's purpose is to fill ActiveRecord models with data and to create database record from these, so that you can have a database filled with thousands of unique, random records simply by running a rake task. Sounds good? you can get it from RubyForge with:
+
+script/plugin install -x svn://rubyforge.org/var/svn/rorem/trunk
+
+or in whatever other way strikes your fancy.
+
+DISCLAIMER:
+
+Rorem is very extracted, very much alpha software and very unstable. Don't use it on a production database, just don't. Don't use it on any database with data you care about because it might (read: probably will) destroy... something. Don't let that scare you though, it'll (probably) not harm anything if you use it on a database with throwaway data.
+
+
