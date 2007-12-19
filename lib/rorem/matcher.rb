@@ -15,7 +15,8 @@ module Rorem
     
     def to_proc
       return @block if @block
-      return proc {|rorem| rorem.send(@type, @options)}
+      # TODO: fix this ugly, ugly hack
+      return eval(%(proc {|rorem| rorem.send("#{@type}", #{@options.inspect})}))
     end
     
     # Will return a string or an array if a match is found

@@ -28,11 +28,10 @@ module Rorem
             # matcher's condition was a Regex with capturing groups.
             if match_parameters = matcher.match?(attribute, self.class.table_name)
               if match_parameters.is_a?(Array)
-                self.send("#{attribute}=", matcher.to_proc.call(Rorem::Generator, *match_parameters))
+                self.send("#{attribute}=", self.instance_exec(Rorem::Generator, *match_parameters, &matcher))
               else
-                self.send("#{attribute}=", matcher.to_proc.call(Rorem::Generator))
+                self.send("#{attribute}=", self.instance_exec(Rorem::Generator, &matcher))
               end
-
               break # abort the looping of the matchers
             end
           end

@@ -83,6 +83,22 @@ describe Rorem::ActiveRecordMethods do
       @instance.first_name.should == @instance.last_name
     end
     
+    it "should not remember instance variables across instances" do
+
+      matcher1 = Rorem::Matcher.new(/_name$/) do |rorem|
+        @word ||= rorem.word
+      end
+
+      @klass.should_receive(:all_rorem_matchers).exactly(8).times.and_return([matcher1])
+
+      @instance.fill
+      @instance.first_name.should == @instance.last_name
+      
+      @instance2 = @klass.new
+      @instance2.fill
+      @instance2.first_name.should_not == @instance.first_name
+    end
+    
     it "should not overwrite an already filled attribute" do
       
       @instance.first_name = "Walruss"
