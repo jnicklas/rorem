@@ -1,33 +1,34 @@
 module Rorem
-
-  class Initializer
+  
+  def self.matchers
+    @matchers ||= []
+  end
     
-    def self.init
-      %w(array_extension randomizer analytics generator record matcher setter filler).each do |path|
-        require File.join(File.dirname(__FILE__), 'rorem', path)
-      end
-      
-      require File.join(File.dirname(__FILE__), 'matchers', 'english')
-
-      ActiveRecord::Base.send(:include, Rorem::Record)
-      
-      self.rails_init if defined?(RAILS_ROOT)
-
-      nil # otherwise this returns AR::Base which looks weird :P
+  def self.init(language = 'english')
+    %w(array_extension randomizer analytics generator active_record_extension matcher filler).each do |path|
+      require File.join(File.dirname(__FILE__), 'rorem', path)
     end
     
-    def self.rails_init
-      ActionView::Base.send(:include, Rorem::Helper)
-      ActionController::Base.send(:include, Rorem::Helper)
+    require File.join(File.dirname(__FILE__), 'matchers', language)
 
-      rorem_file = File.join(RAILS_ROOT, *%w(config rorem.rb))
+    ActiveRecord::Base.extend Rorem::ActiveRecordExtension
+    
+    self.rails_init if defined?(RAILS_ROOT)
 
-      require rorem_file if File.exists?(rorem_file)
-    end
+    nil # otherwise this returns AR::Base which looks weird :P
   end
   
-end
+  def self.rails_init
+    ActionView::Base.send(:include, Rorem::Helper)
+    ActionController::Base.send(:include, Rorem::Helper)
 
-def Rorem.init
-  Rorem::Initializer.init
+    rorem_file = File.join(RAILS_ROOT, *%w(config rorem.rb))
+
+    require rorem_file if File.exists?(rorem_file)
+  end
+  
+  def self.add_matcher(condition, *args, &block)
+    self.matchers.push(Rorem::Matcher.new(condition, *args, &block))
+  end
+  
 end
