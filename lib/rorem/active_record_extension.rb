@@ -51,9 +51,15 @@ module Rorem
         association = self.class.reflect_on_association(association_name)
         
         continue unless association
-
-        record = association.active_record.find(:first, :order => 'RAND()') rand(2).zero?
+        
+        # To my knowledge there is no way to randomly select, that works across databases, so we
+        # have to do thi manually.
+        if rand(2).zero?
+          random_id = association.active_record.find(:all).to_a.random.id
+          record = association.active_record.find(random_id)
+        end
         record ||= association.active_record.new
+
         case association.macro
         when :belongs_to, :has_one
           self.send("#{association_name}=", record)
