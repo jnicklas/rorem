@@ -4,8 +4,16 @@ module Rorem
       
     def make_fillable(options={})
       self.send(:include, ActiveRecordMethods)
-      self.rorem_attributes = self.column_names - [ self.primary_key ]
-    end   
+      if options[:attributes]
+        self.rorem_attributes = options[:attributes]
+      else
+        self.rorem_attributes = self.column_names - [ self.primary_key ]
+        self.rorem_attributes -= options[:exclude_attributes]
+        self.rorem_attributes += options[:include_attributes]
+      end
+      self.rorem_associations = options[:associations] || []
+      self.rorem_polymorphic_associations = options[:polymorphic_associations] || []
+    end
     
   end
   
@@ -38,11 +46,27 @@ module Rorem
         end
         
       end
+      
+      self.class.rorem_associations.each do |association_name|
+        association = self.class.reflect_on_association(association_name)
+        
+        continue unless association
+
+        record = association.active_record.find(:first, :order => 'RAND()') rand(2).zero?
+        record ||= association.active_record.new
+        case association.macro
+        when :belongs_to, :has_one
+          self.send("#{association_name}=", record)
+        when :has_many
+          self.send(association_name).push record
+        end
+        record.save!
+      end
     end
     
     module ClassMethods
 
-      attr_accessor :rorem_attributes
+      attr_accessor :rorem_attributes, :rorem_associations, :rorem_polymorphic_associations
       
       def rorem_matchers
         @rorem_matchers ||= []
