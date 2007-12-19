@@ -44,6 +44,32 @@ describe Rorem::ActiveRecordMethods do
       @instance.last_name.should be_nil
       @instance.email.should be_nil
     end
+    
+    it "should match a regex matcher" do
+      matcher1 = Rorem::Matcher.new(/_name$/, :first_name)
+      matcher2 = Rorem::Matcher.new(/giraffe$/, :monkey)
+
+      @klass.should_receive(:all_rorem_matchers).exactly(4).times.and_return([matcher1, matcher2])
+
+      @instance.fill
+      @instance.first_name.should_not be_nil
+      @instance.last_name.should_not be_nil
+
+      @instance.monkey.should be_nil
+      @instance.email.should be_nil
+    end
+    
+    it "should remember instance variables across matchers" do
+
+      matcher1 = Rorem::Matcher.new(/_name$/) do |rorem|
+        @word ||= rorem.word
+      end
+
+      @klass.should_receive(:all_rorem_matchers).exactly(4).times.and_return([matcher1])
+
+      @instance.fill
+      @instance.first_name.should == @instance.last_name
+    end
   end
   
 end
