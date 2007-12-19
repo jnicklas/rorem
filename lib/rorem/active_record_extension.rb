@@ -19,19 +19,19 @@ module Rorem
     
     def fill
       self.class.rorem_attributes.each do |attribute|
-        
+              
         # loop through all existing matchers and check if this attribute matches anything 
-        self.class.all_rorem_matchers do |matcher|
-          
+        self.class.all_rorem_matchers.each do |matcher|
+        
           # if the matcher matches it will return a parameter, which might be an Array if the 
           # matcher's condition was a Regex with capturing groups.
           if match_parameters = matcher.match?(attribute, self.class.table_name)
             if match_parameters.is_a?(Array)
-              matcher.to_proc.call(Rorem::Generator, *match_parameters)
+              self.send("#{attribute}=", matcher.to_proc.call(Rorem::Generator, *match_parameters))
             else
-              matcher.to_proc.call(Rorem::Generator)
+              self.send("#{attribute}=", matcher.to_proc.call(Rorem::Generator))
             end
-            
+
             break # abort the looping of the matchers
           end
         end

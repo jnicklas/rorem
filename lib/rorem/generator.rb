@@ -88,7 +88,7 @@ module Rorem
       random_datetime(first, second, options[:bias]).to_date
     end
     
-    def monkey
+    def monkey(options={})
       mals = %w(monkey llama donkey moose emu porcupine duck gorilla)
       mals[rand(mals.length)]
     end

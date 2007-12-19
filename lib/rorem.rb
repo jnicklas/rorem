@@ -9,7 +9,7 @@ module Rorem
       require File.join(File.dirname(__FILE__), 'rorem', path)
     end
     
-    require File.join(File.dirname(__FILE__), 'matchers', language)
+    require File.join(File.dirname(__FILE__), 'matchers', language) if language
 
     ActiveRecord::Base.extend Rorem::ActiveRecordExtension
     
