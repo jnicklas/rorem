@@ -82,6 +82,18 @@ describe Rorem::ActiveRecordMethods do
       @instance.fill
       @instance.first_name.should == @instance.last_name
     end
+    
+    it "should not overwrite an already filled attribute" do
+      
+      @instance.first_name = "Walruss"
+      
+      matcher1 = Rorem::Matcher.new("first_name", :first_name)
+
+      @klass.should_receive(:all_rorem_matchers).exactly(3).times.and_return([matcher1])
+
+      @instance.fill
+      @instance.first_name.should == "Walruss"
+    end
   end
   
 end
