@@ -4,6 +4,14 @@ Rorem.add_matcher(/_type$/, :nothing)
 Rorem.add_matcher(/_id$/, :nothing)
 
 # Match names
+Rorem.add_matcher(%w(login log_in username user_name)) do |rorem|
+  @first_name ||= rorem.first_name
+  @last_name ||= rorem.last_name
+  
+  (@first_name[0,1] + @last_name).downcase
+end
+
+# Match names
 Rorem.add_matcher('name', :table => %w(users people contacts admins employees players)) do |rorem|
   @first_name ||= rorem.first_name
   @last_name ||= rorem.last_name

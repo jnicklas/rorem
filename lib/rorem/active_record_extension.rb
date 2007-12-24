@@ -48,7 +48,7 @@ module Rorem
       end
     end
     
-    def fill_association_by_name(associaton_name)
+    def fill_association_by_name(association_name)
       association = self.class.reflect_on_association(association_name)
       fill_association(association) if association
     end
@@ -60,16 +60,14 @@ module Rorem
     
     def fill_association(association)
       record = find_random_record_to_associate(association)
-      record ||= association.active_record.new
-
-      case association.macro
-      when :belongs_to, :has_one
-        self.send("#{association}=", record)
-      when :has_many, :has_and_belongs_to_many
-        self.send("association").push record
+      if record      
+        case association.macro
+        when :belongs_to, :has_one
+          self.send("#{association.name}=", record)
+        when :has_many, :has_and_belongs_to_many
+          self.send(association.name).push record
+        end
       end
-      
-      record.fill if respond_to?(:fill)
     end
     
     def fill_polymorphic_association(association, klass)
@@ -78,21 +76,19 @@ module Rorem
       
       case association.macro
       when :belongs_to, :has_one
-        self.send("#{association}=", record)
+        self.send("#{association.name}=", record)
       when :has_many
-        self.send("association").push record
+        self.send(association.name).push record
       end
       
       record.fill if respond_to?(:fill)
     end
     
-    def find_random_record_to_associate(association, klass = association.active_record)
+    def find_random_record_to_associate(association, klass = association.class_name.constantize)
       # To my knowledge there is no way to randomly select, that works across databases, so we
       # have to do this manually.
-      if rand(2).zero?
-        random_id = klass.find(:all).to_a.random.id
-        return klass.find(random_id)
-      end
+      random_id = klass.find(:all).to_a.random.id
+      return klass.find(random_id)
     end
     
     def run_attribute_against_matchers(attribute)
