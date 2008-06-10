@@ -1,10 +1,5 @@
 namespace :rorem do
   
-  desc "initialize rorem"
-  task :initialize_rorem => :environment do
-    Rorem.init
-  end
-  
   desc "Fill all models with random data or specify a model with MODEL"
   task :fill => :initialize_rorem do
     puts "Filling with Rorem\n"

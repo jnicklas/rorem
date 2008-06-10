@@ -6,44 +6,45 @@ require 'digest/sha1'
 # more than one generator. ever.
 module Rorem
   
-  module Generator
+  class Generator
   
-    def random(type, options={})
-      length = options[:length]
-      if length
-        self.send(type, length, options)
-      else
-        self.send(type, options)
-      end
-    end
-  
-    def word( length = 2..10, options = {} )
+    def word(length = 2..10, options = {})
       length = get_length(length, options)
-      @words_by_length[length].random
+      # pick a word from the list and duplicate it, so that no changes
+      # will be made in the list in case the word is modified later on.
+      self.words_by_length[length].random.dup
     end
     
     def text(length = 10..100, options = {})
-      length = random_integer(length, options[:bias])
+      p length
+      
+      length = get_length(length, options)
       sentence = []
+      
+      # add words to sentence
       length.times do
-        sentence << self.word.dup
+        sentence << word
       end
-      position = random_integer(3..20, -1)
-      while position < (length -2)
-        mark = pick_randomly_from_distribution(Rorem::Analytics.punctuation)
-        sentence[position] << mark
-        if mark =~ /[.?!]/
-          sentence[position+1].capitalize!
-        end
-        position = position + random_integer(3..10, -2)
-      end
+      # add puctuation to words
+      #position = random_integer(3..20, -1)
+      #while position < (length -2)
+      #  mark = pick_randomly_from_distribution(Rorem::Analytics.punctuation)
+      #  sentence[position] << mark
+      #  if mark =~ /[.?!]/
+      #    sentence[position+1].capitalize!
+      #  end
+      #  position = position + random_integer(3..10, -2)
+      #end
+      # Capitalize the first word in the text
       sentence.first.capitalize!
+      # Add a period after the last word in the sentence
       sentence.last << "."
+
       sentence.join(" ")
     end
     
     def title(length = 2..5, options={})
-      length = random_integer(length, options[:bias])
+      length = get_length(length, options)
       words = []
       length.times do
         words << word(2..10, :bias => 1)
@@ -52,29 +53,35 @@ module Rorem
       words.join(' ')
     end
     
-    def string(*args)
-      word(*args).capitalize
+    # FIXME: date and time need to be reworked
+    #def time(ranget = 1.year.ago..Time.now, options = {})
+    #  random_datetime(first..second, options[:bias])
+    #end
+    #
+    #def date(first = 1.year.ago..Time.now, second = nil, options = {})
+    #  random_datetime(first..second, options[:bias]).to_date
+    #end
+    
+    def set(set, options={})
+      case set
+      when Array, Range
+        return set.to_a.random
+      else
+        return set
+      end
     end
     
-    def datetime(*args)
-      time(*args)
-    end
-    
-    def time(first = 1.year.ago, second = Time.now, options = {})
-      random_datetime(first..second, options[:bias])
-    end
-    
-    def date(first = 1.year.ago..Time.now, second = nil, options = {})
-      random_datetime(first..second, options[:bias]).to_date
-    end
-    
-    def monkey(options={})
-      mals = %w(monkey llama donkey moose emu porcupine duck gorilla)
-      mals[rand(mals.length)]
-    end
-    
-    def integer(range = 0..9999, options={})
-      random_integer(range, options[:bias])
+    def integer(length = 0..1000, options={})
+      if length.respond_to?(:to_i)
+        return length.to_i
+      else
+        first = length.first.to_i
+        last = length.last.to_i
+        
+        diff = first - last
+
+        return rand(diff) + first
+      end
     end
     
     def boolean(options={})
@@ -86,15 +93,15 @@ module Rorem
     end
     
     def job(options={})
-      self.jobs.random
+      self.jobs.random.dup
     end
     
     def first_name(options={})
-      self.first_names.random
+      self.first_names.random.dup
     end
     
     def last_name(options={})
-      self.last_names.random
+      self.last_names.random.dup
     end
     
     def name(options={})
@@ -107,12 +114,16 @@ module Rorem
     
     protected
     
+    def get_length(length, options)
+      integer(length, options)
+    end
+    
     def asset_path(asset)
-      File.join(File.dirname(__FILE__), '..', '..', 'assets', "#{asset}.txt"))
+      File.join(File.dirname(__FILE__), '..', '..', 'assets', "#{asset}.txt")
     end
     
     def asset_array(asset)
-      File.read(asset_path(asset)).to_s
+      File.read(asset_path(asset)).to_a.map {|a| a.chomp }
     end
     
     def jobs
@@ -132,14 +143,15 @@ module Rorem
     end
     
     def words_by_length
-      return @words_by_length if @words_by_length
-      @words_by_length = {}
-      words.each do |w|
-        @words_by_length[w.length] ||= []
-        @words_by_length[w.length] << w.downcase
+      unless @words_by_length
+        @words_by_length = {}
+        words.each do |w|
+          @words_by_length[w.length] ||= []
+          @words_by_length[w.length] << w.downcase
+        end
       end
+      return @words_by_length
     end
   end
-  
-  Generator = GeneratorClass.new
+
 end

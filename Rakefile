@@ -5,7 +5,7 @@ require 'spec/rake/spectask'
 
 file_list = FileList['spec/*_spec.rb']
 
-desc "Run all examples with RCov"
+desc "Run all examples"
 Spec::Rake::SpecTask.new('spec') do |t|
   t.spec_files = file_list
 end
@@ -35,16 +35,8 @@ namespace :spec do
 
 end
 
-
 desc 'Default: run unit tests.'
-task :default => 'spec:rcov'
-
-desc 'Test the Rorem plugin.'
-Rake::TestTask.new(:test) do |t|
-  t.libs << 'lib'
-  t.pattern = 'test/**/*_test.rb'
-  t.verbose = true
-end
+task :default => 'spec'
 
 namespace "doc" do
   

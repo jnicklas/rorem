@@ -17,8 +17,12 @@ module Rorem
       instance_exec(@object, &@block)
     end
     
-    def random(set, options={})
-      Rorem::Random.random(set, options)
+    def random(*args)
+      if args.any?
+        return generator.set(*args)
+      else
+        return generator
+      end
     end
     
     def sequence(name, options={})
@@ -27,6 +31,12 @@ module Rorem
     
     def normal(average, standard_deviation)
       #Rorem::NormalDistribution(average, standard_deviation)
+    end
+    
+    protected
+    
+    def generator
+      @generato ||= Rorem::Generator.new
     end
     
   end
