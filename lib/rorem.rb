@@ -1,34 +1,47 @@
-module Rorem
-  
-  def self.matchers
-    @matchers ||= []
-  end
-    
-  def self.init(language = 'english')
-    %w(array_extension randomizer analytics generator active_record_extension matcher).each do |path|
-      require File.join(File.dirname(__FILE__), 'rorem', path)
-    end
-    
-    require File.join(File.dirname(__FILE__), 'matchers', language) if language
+require 'rubygems'
+require 'facets'
 
-    ActiveRecord::Base.extend Rorem::ActiveRecordExtension
-    
-    self.rails_init if defined?(RAILS_ROOT)
+path = File.join(File.dirname(__FILE__), 'rorem/')
 
-    true # otherwise this returns AR::Base which looks weird :P
-  end
-  
-  def self.rails_init
-    ActionView::Base.send(:include, Rorem::Helper)
-    ActionController::Base.send(:include, Rorem::Helper)
+require path + 'analytics'
+require path + 'random'
+require path + 'array_extension'
+require path + 'model'
+require path + 'filler'
 
-    rorem_file = File.join(RAILS_ROOT, *%w(config rorem.rb))
+class Car
 
-    require rorem_file if File.exists?(rorem_file)
-  end
-  
-  def self.add_matcher(condition, *args, &block)
-    self.matchers.push(Rorem::Matcher.new(condition, *args, &block))
-  end
+  include Rorem::Model
+
+  attr_accessor :brand, :seats, :owner_name, :owner_age, :special_car
   
 end
+
+Car.factory do |car|
+
+  # all brands are equality likely
+  car.brand = random(%w(BMW Mercedes Volvo Jaguar))
+  
+  # assign probabilities to each value
+  car.seats = random([2, 4], :distribution => [0.2, 0.8])
+  
+  # use a normal distribution to describe probabilities
+  car.owner_age = random(18..70, :distribution => normal(40, 15))
+  
+  # generate a name from rorem's database of names
+  car.owner_name = random(:name)
+  
+  # a deterministic value can be set
+  car.special_car = false
+
+end
+
+c = Car.new
+
+c.fill
+
+p c.brand #=> 'BMW'
+p c.seats #=> 4
+p c.owner_age #=> 27
+p c.owner_name #=> 'Allan Hernandez'
+p c.special_car #=> false

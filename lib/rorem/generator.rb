@@ -6,39 +6,19 @@ require 'digest/sha1'
 # more than one generator. ever.
 module Rorem
   
-  class GeneratorClass
+  module Generator
   
-    include Rorem::Randomizers
-  
-    attr_reader :words, :words_by_length, :jobs, :first_names, :last_names
-  
-    def initialize
-      
-      File.open(File.join(File.dirname(__FILE__), '..', '..', 'assets', 'latin.txt')) do |f|
-        @words = f.read.gsub(/[^a-zA-Z\s]/, '').split.uniq.delete_if { |w| w.length < 2 }
-        @words_by_length = {}
-        @words.each do |w|
-          @words_by_length[w.length] ||= []
-          @words_by_length[w.length] << w.downcase
-        end
+    def random(type, options={})
+      length = options[:length]
+      if length
+        self.send(type, length, options)
+      else
+        self.send(type, options)
       end
-      
-      File.open(File.join(File.dirname(__FILE__), '..', '..', 'assets', 'jobs.txt')) do |f|
-        @jobs = f.read.to_a.map {|l| l.chomp }
-      end
-
-      File.open(File.join(File.dirname(__FILE__), '..', '..', 'assets', 'names.first.txt')) do |f|
-        @first_names = f.read.to_a.map {|l| l.chomp }
-      end
-
-      File.open(File.join(File.dirname(__FILE__), '..', '..', 'assets', 'names.last.txt')) do |f|
-        @last_names = f.read.to_a.map {|l| l.chomp }
-      end
-
     end
-
+  
     def word( length = 2..10, options = {} )
-      length = random_integer(length, options[:bias])
+      length = get_length(length, options)
       @words_by_length[length].random
     end
     
@@ -121,12 +101,43 @@ module Rorem
       "#{first_name} #{last_name}"
     end
     
-    def nothing(options={})
-      :nothing
-    end
-    
     def inspect
       "<Rorem::Generator #{self.object_id}>"
+    end
+    
+    protected
+    
+    def asset_path(asset)
+      File.join(File.dirname(__FILE__), '..', '..', 'assets', "#{asset}.txt"))
+    end
+    
+    def asset_array(asset)
+      File.read(asset_path(asset)).to_s
+    end
+    
+    def jobs
+      @jobs ||= asset_array('jobs')
+    end
+    
+    def first_names
+      @first_names ||= asset_array('first_names')
+    end
+    
+    def last_names
+      @last_names ||= asset_array('last_names')
+    end
+    
+    def words
+      @words ||= File.read(asset_path('latin')).gsub(/[^a-zA-Z\s]/, '').split.uniq.delete_if { |w| w.length < 2 }
+    end
+    
+    def words_by_length
+      return @words_by_length if @words_by_length
+      @words_by_length = {}
+      words.each do |w|
+        @words_by_length[w.length] ||= []
+        @words_by_length[w.length] << w.downcase
+      end
     end
   end
   
