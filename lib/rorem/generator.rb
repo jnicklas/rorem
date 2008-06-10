@@ -12,12 +12,10 @@ module Rorem
       length = get_length(length, options)
       # pick a word from the list and duplicate it, so that no changes
       # will be made in the list in case the word is modified later on.
-      self.words_by_length[length].random.dup
+      Rorem::WORDS_BY_LENGTH[length].random.dup
     end
     
     def text(length = 10..100, options = {})
-      p length
-      
       length = get_length(length, options)
       sentence = []
       
@@ -89,19 +87,19 @@ module Rorem
     end
     
     def digest(options={})
-      Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{self.word}--")
+      Digest::SHA1.hexdigest("--#{Time.now.to_s}--#{word}--")
     end
     
     def job(options={})
-      self.jobs.random.dup
+      Rorem::JOBS.random.dup
     end
     
     def first_name(options={})
-      self.first_names.random.dup
+      Rorem::FIRST_NAMES.random.dup
     end
     
     def last_name(options={})
-      self.last_names.random.dup
+      Rorem::LAST_NAMES.random.dup
     end
     
     def name(options={})
@@ -123,35 +121,13 @@ module Rorem
     end
     
     def asset_array(asset)
-      File.read(asset_path(asset)).to_a.map {|a| a.chomp }
+      c = 0
+      File.read(asset_path(asset)).to_a.map {|a| a.chomp }.delete_if {
+        c += 1
+        c % 4 != 0
+      }
     end
-    
-    def jobs
-      @jobs ||= asset_array('jobs')
-    end
-    
-    def first_names
-      @first_names ||= asset_array('first_names')
-    end
-    
-    def last_names
-      @last_names ||= asset_array('last_names')
-    end
-    
-    def words
-      @words ||= File.read(asset_path('latin')).gsub(/[^a-zA-Z\s]/, '').split.uniq.delete_if { |w| w.length < 2 }
-    end
-    
-    def words_by_length
-      unless @words_by_length
-        @words_by_length = {}
-        words.each do |w|
-          @words_by_length[w.length] ||= []
-          @words_by_length[w.length] << w.downcase
-        end
-      end
-      return @words_by_length
-    end
+        
   end
 
 end
