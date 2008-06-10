@@ -9,7 +9,8 @@ module Rorem
     
     module ClassMethods
       
-      def fill(length = 10..20, options={})
+      def fill(length = nil, options={})
+        length ||= factory_count || 10..20
         count = Rorem::Generator.new.integer(length, options={})
         count.times do
           self.new

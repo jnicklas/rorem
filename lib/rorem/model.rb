@@ -13,9 +13,10 @@ module Rorem
     
     module ClassMethods
       
-      attr_reader :factory_block
+      attr_reader :factory_block, :factory_count
     
-      def factory(&block)
+      def factory(count=nil, &block)
+        @factory_count = count
         @factory_block = block
       end
       
