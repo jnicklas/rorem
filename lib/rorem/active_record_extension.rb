@@ -127,7 +127,7 @@ module Rorem
       
       def fill(count)
         self.transaction do
-          Rorem::Randomizer.random_length(count).times do
+          Rorem::Randomizer.random_integer(count).times do
             record = self.new
             record.fill
             record.save!

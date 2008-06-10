@@ -15,7 +15,7 @@ module Rorem
     
     self.rails_init if defined?(RAILS_ROOT)
 
-    nil # otherwise this returns AR::Base which looks weird :P
+    true # otherwise this returns AR::Base which looks weird :P
   end
   
   def self.rails_init

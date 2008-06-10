@@ -38,24 +38,24 @@ module Rorem
     end
 
     def word( length = 2..10, options = {} )
-      length = random_length(length, options[:bias])
+      length = random_integer(length, options[:bias])
       @words_by_length[length].random
     end
     
     def text(length = 10..100, options = {})
-      length = random_length(length, options[:bias])
+      length = random_integer(length, options[:bias])
       sentence = []
       length.times do
         sentence << self.word.dup
       end
-      position = biasedrand(3..20, -1)
+      position = random_integer(3..20, -1)
       while position < (length -2)
-        mark = distributionrand(Rorem::Analytics.punctuation)
+        mark = pick_randomly_from_distribution(Rorem::Analytics.punctuation)
         sentence[position] << mark
         if mark =~ /[.?!]/
           sentence[position+1].capitalize!
         end
-        position = position + biasedrand(3..10, -2)
+        position = position + random_integer(3..10, -2)
       end
       sentence.first.capitalize!
       sentence.last << "."
@@ -63,7 +63,7 @@ module Rorem
     end
     
     def title(length = 2..5, options={})
-      length = random_length(length, options[:bias])
+      length = random_integer(length, options[:bias])
       words = []
       length.times do
         words << word(2..10, :bias => 1)
@@ -81,11 +81,11 @@ module Rorem
     end
     
     def time(first = 1.year.ago, second = Time.now, options = {})
-      random_datetime(first, second, options[:bias])
+      random_datetime(first..second, options[:bias])
     end
     
     def date(first = 1.year.ago..Time.now, second = nil, options = {})
-      random_datetime(first, second, options[:bias]).to_date
+      random_datetime(first..second, options[:bias]).to_date
     end
     
     def monkey(options={})
@@ -94,7 +94,7 @@ module Rorem
     end
     
     def integer(range = 0..9999, options={})
-      random_length(range, options[:bias])
+      random_integer(range, options[:bias])
     end
     
     def boolean(options={})
@@ -130,7 +130,5 @@ module Rorem
     end
   end
   
-  # most of the time you'll be using Rorem::Generator, which is an INSTANCE of GeneratorClass,
-  # it is NOT a class or module!
   Generator = GeneratorClass.new
 end
