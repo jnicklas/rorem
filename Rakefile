@@ -28,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = HOMEPAGE
   s.require_path = 'lib'
   s.autorequire = PLUGIN
-  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec,assets,tasks}/**/*")
+  s.files = %w(LICENSE README Rakefile TODO) + Dir.glob("{lib,spec,tasks}/**/*")
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|

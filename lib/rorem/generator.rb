@@ -26,7 +26,7 @@ module Rorem
       # add puctuation to words
       #position = random_integer(3..20, -1)
       #while position < (length -2)
-      #  mark = pick_randomly_from_distribution(Rorem::Analytics.punctuation)
+      #  mark = set(['!', ',', '.', ':', ';', '?'], :distribution => [10, 54, 22, 5, 4, 5])
       #  sentence[position] << mark
       #  if mark =~ /[.?!]/
       #    sentence[position+1].capitalize!
