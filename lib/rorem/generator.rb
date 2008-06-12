@@ -24,18 +24,21 @@ module Rorem
         sentence << word
       end
       # add puctuation to words
-      #position = random_integer(3..20, -1)
-      #while position < (length -2)
-      #  mark = set(['!', ',', '.', ':', ';', '?'], :distribution => [10, 54, 22, 5, 4, 5])
-      #  sentence[position] << mark
-      #  if mark =~ /[.?!]/
-      #    sentence[position+1].capitalize!
-      #  end
-      #  position = position + random_integer(3..10, -2)
-      #end
+      position = integer(3..10)
+      while position < (length -2)
+        # get a random punctuation mark
+        mark = set(['!', ',', '.', ':', ';', '?'], :distribution => [5, 54, 22, 2, 2, 5])
+        # add it to the word at position
+        sentence[position] << mark
+        # Capitalize the next word if the mark is . ? or !
+        if mark =~ /[.?!]/
+          sentence[position+1].capitalize!
+        end
+        position = position + integer(3..10)
+      end
       # Capitalize the first word in the text
       sentence.first.capitalize!
-      # Add a period after the last word in the sentence
+      # Add a period after the last word in the text
       sentence.last << "."
 
       sentence.join(" ")
@@ -63,7 +66,11 @@ module Rorem
     def set(set, options={})
       case set
       when Array, Range
-        return set.to_a.random
+        if options[:distribution]
+          return Rorem::Distribution.pick(set.to_a, options[:distribution])
+        else
+          return set.to_a.random
+        end
       else
         return set
       end
@@ -72,13 +79,14 @@ module Rorem
     def integer(length = 0..1000, options={})
       if length.respond_to?(:to_i)
         return length.to_i
+      elsif options[:distribution]
+        return set(length.to_a, options)
       else
-        first = length.first.to_i
-        last = length.last.to_i
+        first, last = [length.first.to_i, length.last.to_i].sort
         
-        diff = first - last
-
-        return rand(diff) + first
+        diff = last - first
+        
+        return rand(diff + 1) + first
       end
     end
     

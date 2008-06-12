@@ -1,10 +1,4 @@
-require 'rubygems'
-require 'spec'
-gem 'activerecord'
-require 'active_record'
-
-require File.join(File.dirname(__FILE__), '..', 'lib', 'rorem.rb')
-Rorem.init
+require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe Array do
   it "should sum all elements if they're integers" do

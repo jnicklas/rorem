@@ -10,7 +10,7 @@ module Rorem
     module ClassMethods
       
       def fill(length = nil, options={})
-        length ||= factory_count || 10..20
+        length ||= factory_length || 10..20
         count = Rorem::Generator.new.integer(length, options={})
         count.times do
           self.new
@@ -24,3 +24,5 @@ module Rorem
   end
   
 end
+
+ActiveRecord::Base.send(:include, Rorem::ActiveRecord)
