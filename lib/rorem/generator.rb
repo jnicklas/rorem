@@ -48,7 +48,7 @@ module Rorem
       length = get_length(length, options)
       words = []
       length.times do
-        words << word(2..10, :bias => 1)
+        words << word(2..10)
       end
       words.first.capitalize!
       words.join(' ')

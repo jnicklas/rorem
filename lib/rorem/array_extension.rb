@@ -1,6 +1,6 @@
 class Array
   def random
-    self[rand(self.length)]
+    self[Kernel.rand(self.length)]
   end
   
   def sum(identity = 0, &block)
