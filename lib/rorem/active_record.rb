@@ -13,9 +13,9 @@ module Rorem
         length ||= factory_length || 10..20
         count = Rorem::Generator.new.integer(length, options={})
         count.times do
-          self.new
-          self.fill
-          self.save!
+          record = self.new
+          record.fill
+          record.save!
         end
       end
       
