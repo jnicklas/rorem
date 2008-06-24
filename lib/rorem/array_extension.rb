@@ -3,15 +3,13 @@ class Array
     self[rand(self.length)]
   end
   
-  def sum
-    if self.length > 1
-      total = self.first #This must be a value from the array
-      self[1,self.length].each do |v|
-        total = total + v
-      end
-      return total
+  def sum(identity = 0, &block)
+    return identity unless size > 0
+  
+    if block_given?
+      map(&block).sum
     else
-      return self.first
+      inject { |sum, element| sum + element }
     end
   end
 end
