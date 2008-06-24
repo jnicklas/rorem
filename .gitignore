@@ -1,2 +1,4 @@
 coverage
 pkg
+.DS_Store
+spec/test.rb
