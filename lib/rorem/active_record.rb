@@ -25,4 +25,5 @@ module Rorem
   
 end
 
+ActiveRecord::Base.send(:include, Rorem::Model)
 ActiveRecord::Base.send(:include, Rorem::ActiveRecord)
