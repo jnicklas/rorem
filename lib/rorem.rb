@@ -1,11 +1,19 @@
-require 'rubygems'
-require 'facets'
+module Rorem
 
-path = File.join(File.dirname(__FILE__), 'rorem/')
+  class << self
+    def init
+      require 'rubygems'
+      require 'facets' # TODO: REMOVE THIS PIECE OF SHIT
+    
+      path = File.join(File.dirname(__FILE__), 'rorem/')
 
-require path + 'lists'
-require path + 'generator'
-require path + 'distribution'
-require path + 'array_extension'
-require path + 'model'
-require path + 'filler'
+      require path + 'lists'
+      require path + 'generator'
+      require path + 'distribution'
+      require path + 'array_extension'
+      require path + 'model'
+      require path + 'filler'
+    end
+  end
+  
+end
